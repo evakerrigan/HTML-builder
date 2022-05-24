@@ -9,19 +9,24 @@ fs.readdir(filePath, (err, files) => {
     throw err;
   }
   files.forEach((file) => {
-    fs.stat(path, (err, stats) => {
+    //fs.stat(path, (err, stats) => {
       //if (stats.isFile()) {
 
-        let name = file.split(".");
-        let ext = path.extname;
-        let size = stats['size'];
+        let name = file.split('.', 1);
+        //let name = path.parse(file).name;
+        //let ext = path.parse(file).extname;
+        //let size = stats['size'];
 
-        stdout.write(file);
-        stdout.write(ext);
-        stdout.write(size);
+        //stdout.write(file);
+        stdout.write(`\n`);
+        stdout.write(name);
+        //stdout.write(ext);
+        //stdout.write(size);
+
+        console.log(typeof file);
 
         //stdout.write('${name} - ${ext} - ${size} 'bite' \n');
       //}
-    });
+    //});
   });
 });
