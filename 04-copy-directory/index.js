@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const fsPromis = require('fs/promises');
 
-const file4Path = path.join(__dirname, "4-path");
+const file4Path = path.join(__dirname, "files-copy");
 const filePath = path.join(__dirname, "files");
 
 async function promisDir() {
@@ -14,14 +14,14 @@ async function promisDir() {
     await fsPromis.mkdir(file4Path, { recursive: true }, err => {
       if(err) throw err;
     });
-    copyFiles();
+    copyDir();
 
 }
 
 promisDir();
 
 
-function copyFiles() {
+function copyDir() {
   fs.readdir(filePath, (err, files) => {
 
   if (err) {
