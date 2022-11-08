@@ -9,17 +9,18 @@ const fileAssetsPath = path.join(__dirname, "assets");
 const fileStylePath = path.join(__dirname, "styles");
 const template = path.join(__dirname, "template.html");
 const style = path.join(fileProjectPath, "style.css");
-const html = path.join(fileProjectPath, "index.html");
+const indexHtml = path.join(fileProjectPath, "index.html");
 
 
 promisDir();
 
 async function promisDir() {
 
+  //удаляем папку project-dist
   await fsPromis.rm(fileProjectPath, { recursive: true, force: true }, err => {
     if(err) throw err;
   });
-
+  //создаем папку project-dist
   await fsPromis.mkdir(fileProjectPath, { recursive: true }, err => {
     if(err) throw err;
   });
@@ -30,9 +31,9 @@ async function promisDir() {
 
 
 async function addStyle() {
-
+  //читаем папку с файлами стилей и заносим их список в переменную
   const files = await fsPromis.readdir(fileStylePath, { withFileTypes: true });
-
+  //создаем файл style.css
   let written = fs.createWriteStream(style, 'utf-8');
 
   for (let i=0; i<files.length; i++) {
@@ -51,31 +52,36 @@ async function addStyle() {
 
 async function addHtml() {
 
+  //создаем список из файлов после чтения папки компонентов
   const htmlFiles = await fsPromis.readdir(fileComponentPath, { withFileTypes: true });
 
-  let written = fs.createWriteStream(html, 'utf-8');
+  //создаем файл index.html
+  let written = fs.createWriteStream(indexHtml, 'utf-8');
 
-  for (let i=0; i<htmlFiles.length; i++) {
+    //создаем массив из списка файлов компонент
+    const componentsArr = await fsPromis.readdir(fileComponentPath, err => {
+      if (err) throw err;
+    })
 
-    const fileName = htmlFiles[i].name.split('.')[0];
-    const fileExtention = htmlFiles[i].name.split('.')[1];
+    //создаем переменную в которую копируем файл template
+    let readed = await fsPromis.readFile(template, 'utf8');
 
-    if (fileExtention === 'html' && htmlFiles[i].isFile()) {
-
-      if (fileName === 'articles') {
-        console.log('article');
-      }
-
-      if (fileName === 'footer') {
-        console.log('footer');
-      }
-
-      if (fileName === 'header') {
-        console.log('header');
+    //циклом проходимся по массиву компонент
+    for (let i = 0; i < componentsArr.length; i++) {
+      //заносим в переменную расширение текущей компоненты
+      const fileExtention = componentsArr[i].split('.')[1];
+      //заносим в переменную название текущей компоненты
+      const componentName = componentsArr[i].split('.')[0];
+      //проверяем, является ли эта компонента html-файлом
+      if (fileExtention === 'html') {
+            //заносим в переменную содержимое текущего компонента
+            const templateItem = await fsPromis.readFile(path.join(fileComponentPath, componentsArr[i]), 'utf8');
+            //в переменной в которой лежит файл template заменяем переменную на содержимое текущего компонента
+            readed = readed.replace(`{{${componentName}}}`, templateItem);
       }
     }
-
-  }
+    //в файл index.html записываем то что получилось в переменной readed
+    written.write(readed, 'utf8');
 
 }
 
@@ -94,7 +100,7 @@ async function copyFiles() {
 
           //назначаем переменной имя папки
           let dirName = dir;
-          console.log('dirName =', dirName);
+
           //назначаем переменной путь до папки внутри папки assets
           let fileAssetsPathDir = path.join(fileAssetsPath, dirName);
           //назначаем переменной путь до папки с таким же именем в папке project-dist
@@ -109,7 +115,7 @@ async function copyFiles() {
                   if (err) {
                     throw err;
                   }
-
+                  //проходим циклом по каждому файлу в этой папке и копируем каждый файл в такую же папку в папке project-dist
                   assetsFiles.forEach((file) => {
                     fs.copyFile(path.join(fileAssetsPathDir, file ), path.join(fileProjectAssetsPathDir, file), (err) => {
                       if (err) {
