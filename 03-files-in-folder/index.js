@@ -9,7 +9,8 @@ fs.readdir(filePath, (err, files) => {
     throw err;
   }
   files.forEach((file) => {
-    const fullPath = `${filePath}/${file}`;
+    // const fullPath = `${filePath}/${file}`;
+    const fullPath = path.join(filePath, file);
     fs.stat(fullPath, (err, stats) => {
       if (err) {
         throw err;
