@@ -8,14 +8,12 @@ const bundle = path.join(fileProjectPath, 'bundle.css');
 async function promisDir() {
 
   const files = await fsPromis.readdir(fileStylePath, { withFileTypes: true });
-      // console.log(files);
 
   let written = fs.createWriteStream(bundle, 'utf-8');
 
   for (let i=0; i<files.length; i++) {
 
     const fileName = files[i].name.split('.')[1];
-    // console.log(fileName);
 
     if (fileName === 'css' && files[i].isFile()) {
       const fullPath = path.join(fileStylePath, files[i].name);
@@ -27,4 +25,3 @@ async function promisDir() {
   }
 }
 promisDir();
-
